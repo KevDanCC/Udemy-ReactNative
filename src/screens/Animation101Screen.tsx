@@ -1,11 +1,14 @@
-import React, { useRef } from 'react'
-import { Animated, Button, Easing, StyleSheet, View } from 'react-native';
+import React, { useContext, useRef } from 'react'
+import { Animated, Button, Easing, StyleSheet, Text, View } from 'react-native';
+import { ThemeContext } from '../context/themeContext/ThemeContext';
 import { useAnimation } from '../hooks/useAnimation';
 // import { styles } from '../theme/appTheme';
+import { TouchableOpacity } from 'react-native-gesture-handler';
 
 export const Animation101Screen = () => {
 
-    const { fadeIn, fadeOut, opacity,  startMovingPosition, position } = useAnimation();
+    const { fadeIn, fadeOut, opacity, startMovingPosition, position } = useAnimation();
+    const { theme: { colors } } = useContext(ThemeContext);
 
 
     return (
@@ -20,12 +23,45 @@ export const Animation101Screen = () => {
             }}>
 
             </Animated.View>
-            <View style={{ flexDirection: 'row', width: '40%', justifyContent: 'space-between' }}>
-                <Button title="FadeIn" onPress={()=>{
-                    fadeIn();
-                    startMovingPosition().start();
-                }} />
-                <Button title="FadeOut" onPress={fadeOut} />
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between',}}>
+                <TouchableOpacity
+                    onPress={() => {
+                        fadeIn();
+                        startMovingPosition().start();
+                    }}
+                    style={{
+                        opacity: 0.8,
+                        width: 150,
+                        height: 50,
+                        borderRadius: 20,
+                        backgroundColor: colors.primary,
+                        justifyContent: 'center'
+                    }}
+                >
+                    <Text
+                        style={{
+                            color: colors.text,
+                            textAlign:'center'
+                        }}
+                    >FadeIn</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={fadeOut}
+                    style={{
+                        opacity: 0.8,
+                        width: 150,
+                        height: 50,
+                        borderRadius: 20,
+                        backgroundColor: colors.primary,
+                        justifyContent: 'center'
+                    }}
+                >
+                    <Text
+                        style={{
+                             color: colors.text ,
+                             textAlign:'center'
+                            }}
+                    >FadeOut</Text>
+                </TouchableOpacity>
             </View>
 
         </View>

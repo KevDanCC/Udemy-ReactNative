@@ -1,11 +1,13 @@
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { View, TextInput, StyleSheet, KeyboardAvoidingView, Platform, ScrollView, Text } from 'react-native';
 import { HeaderTitle } from '../components/HeaderTitle';
 import { styles } from '../theme/appTheme';
 import { CustomSwitch } from '../components/CustomSwitch';
 import { useForm } from '../hooks/useForm';
+import { ThemeContext } from '../context/themeContext/ThemeContext';
 
 export const TextInputScreen = () => {
+
     const { form, onChange } = useForm({
         name: '',
         email: '',
@@ -13,17 +15,22 @@ export const TextInputScreen = () => {
         isSuscribe: false
     });
 
+    const { theme: { colors } } = useContext(ThemeContext);
+
     return (
             <ScrollView>
                 <View style={styles.globalMargin}>
-                    <TextInput style={localStyles.inputStyle}
+                    <TextInput style={{...localStyles.inputStyle,backgroundColor:colors.primary, color:colors.text}}
                         placeholder='Ingrese su nombre'
+                        placeholderTextColor={colors.card}
                         autoCorrect={false}
                         autoCapitalize='words'
                         onChangeText={(value) => onChange(value, 'name')}
+                        
                     />
-                    <TextInput style={localStyles.inputStyle}
+                    <TextInput style={[localStyles.inputStyle,{backgroundColor:colors.primary, color:colors.text}]}
                         placeholder='Ingrese su email'
+                        placeholderTextColor={colors.card}
                         autoCorrect={false}
                         autoCapitalize='none'
                         onChangeText={(value) => onChange(value, 'email')}
@@ -40,8 +47,9 @@ export const TextInputScreen = () => {
                     <HeaderTitle title={JSON.stringify(form, null, 2)}></HeaderTitle>
                     <HeaderTitle title={JSON.stringify(form, null, 2)}></HeaderTitle>
 
-                    <TextInput style={localStyles.inputStyle}
+                    <TextInput style={[localStyles.inputStyle,{backgroundColor:colors.primary, color:colors.text}]}
                         placeholder='Ingrese su teléfono'
+                        placeholderTextColor={colors.card}
                         onChangeText={(value) => onChange(value, 'phone')}
                         keyboardType='phone-pad'
                     />
