@@ -1,8 +1,10 @@
-import React, { useEffect, useContext } from 'react'
+import React, { useEffect, useContext, useState } from 'react'
 import { StyleSheet, Text, View, TouchableOpacity, ScrollView, TextInput, Button, Image } from 'react-native';
 import { StackScreenProps } from '@react-navigation/stack'
 import { Picker } from '@react-native-picker/picker';
 import { ProductsStackParams } from '../navigator/ProductsNavigator';
+import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
+
 import useCategories from '../hooks/useCategories';
 import LoadingScreen from './LoadingScreen';
 import { useForm } from '../hooks/useForm';
@@ -15,7 +17,8 @@ const ProductScreen = ({ route, navigation }: Props) => {
     const { id = '', name = '' } = route.params;
 
     const { categories, isLoading } = useCategories();
-    const { loadProductById, addProduct, updateProduct } = useContext(ProductsContext)
+    const { loadProductById, addProduct, updateProduct, uploadImage } = useContext(ProductsContext)
+    const [tempURI, setTempURI] = useState<string>('')
 
     const { _id, categoriaId, nombre, img, form, onChange, setFormValue } = useForm({
         _id: id,
@@ -53,18 +56,53 @@ const ProductScreen = ({ route, navigation }: Props) => {
     }
 
 
-    const saveOrUpdate = async() => {
-        if (_id.length > 0){
+    const saveOrUpdate = async () => {
+        if (_id.length > 0) {
             updateProduct(categoriaId, nombre, _id)
         }
-        else{
+        else {
             // if(!categoriaId ) onChange(categories[0]._id,'categoriaId')
-            const temporal= categoriaId || categories[0]._id;
-           const newProductAdd=await addProduct(temporal,nombre)
-            onChange(temporal,'categoriaId')
-            onChange(newProductAdd._id,'_id')
+            const temporal = categoriaId || categories[0]._id;
+            const newProductAdd = await addProduct(temporal, nombre)
+            onChange(temporal, 'categoriaId')
+            onChange(newProductAdd._id, '_id')
         }
     }
+
+    const takePhoto = () => {
+        launchCamera({
+            mediaType: 'photo',
+            quality: 0.5
+        }, (resp) => {
+            if (resp.didCancel) return;
+
+            if (!resp.assets![0].uri) return;
+
+            setTempURI(resp.assets![0].uri);
+            uploadImage(resp,_id);
+
+            console.log(resp);
+        });
+    }
+
+
+
+    const takePhotoFromGallery=()=>{
+        launchImageLibrary({
+            mediaType: 'photo',
+            quality: 0.5
+        }, (resp) => {
+            if (resp.didCancel) return;
+
+            if (!resp.assets![0].uri) return;
+
+            setTempURI(resp.assets![0].uri);
+            uploadImage(resp,_id);
+
+            console.log(resp);
+        });
+    }
+
 
 
     return (
@@ -113,12 +151,12 @@ const ProductScreen = ({ route, navigation }: Props) => {
                                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 10, marginHorizontal: 70 }}>
                                         <Button
                                             title='Cámara'
-                                            onPress={() => { }}
+                                            onPress={takePhoto}
                                             color='#5856D6'
                                         />
                                         <Button
                                             title='Galeria'
-                                            onPress={() => { }}
+                                            onPress={takePhotoFromGallery}
                                             color='#5856D6'
                                         />
                                     </View>
@@ -129,9 +167,23 @@ const ProductScreen = ({ route, navigation }: Props) => {
                             <Text>{JSON.stringify(form, null, 3)}</Text>
 
                             {
-                                img.length > 0 && (
+                                (img.length > 0 && !tempURI ) && (
                                     <Image
                                         source={{ uri: img }}
+                                        style={{
+                                            width: '100%',
+                                            height: 300,
+                                            marginTop: 20,
+                                            marginBottom: 50
+
+                                        }}
+                                    />
+                                )
+                            }
+                            {
+                                tempURI && (
+                                    <Image
+                                        source={{ uri: tempURI }}
                                         style={{
                                             width: '100%',
                                             height: 300,
